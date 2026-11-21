@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Atelier Nordique — Design & Art de Vivre</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Playfair Display pour une touche éditoriale -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        terracotta: {
+                            500: '#c2593f',
+                            600: '#a84830',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Personnalisation subtile de la barre de défilement */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-stone-900 selection:text-white">
+
+    <!-- Bannière promotionnelle supérieure -->
+    <div class="bg-stone-900 text-stone-100 text-xs sm:text-sm py-2.5 px-4 text-center font-medium tracking-wide">
+        Livraison offerte en France métropolitaine dès <span class="underline decoration-terracotta-500 underline-offset-4 font-semibold">100 € d'achat</span> — Retours gratuits sous 30 jours.
+    </div>
+
+    <!-- Navigation Principale (Sticky) -->
+    <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-stone-200/80 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+                
+                <!-- Logo -->
+                <a href="#" onclick="resetFilters(event)" class="flex items-center gap-2.5 group shrink-0">
+                    <div class="w-9 h-9 bg-stone-900 text-white rounded-xl flex items-center justify-center font-serif text-xl italic group-hover:bg-terracotta-600 transition-colors">
+                        A
+                    </div>
+                    <span class="font-serif text-xl sm:text-2xl font-semibold tracking-tight text-stone-900">
+                        L'Atelier Nordique
+                    </span>
+                </a>
+
+                <!-- Barre de recherche (Desktop) -->
+                <div class="hidden md:flex flex-1 max-w-md mx-6">
+                    <div class="relative w-full">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input 
+                            type="text" 
+                            id="searchInputDesktop"
+                            placeholder="Rechercher une lampe, un fauteuil, céramique..." 
+                            class="w-full bg-stone-100/90 hover:bg-stone-100 focus:bg-white text-sm text-stone-900 placeholder-stone-400 pl-10 pr-9 py-2.5 rounded-full border border-transparent focus:border-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-900/5 transition-all"
+                        >
+                        <button id="clearSearchDesktop" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions droite : Favoris & Panier -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Bouton Recherche Mobile -->
+                    <button onclick="toggleMobileSearch()" class="md:hidden p-2.5 text-stone-700 hover:bg-stone-100 rounded-full transition-colors" aria-label="Rechercher">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- Bouton Panier -->
+                    <button onclick="toggleCart(true)" class="relative flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm hover:shadow active:scale-95">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Panier</span>
+                        <span id="cartBadge" class="bg-terracotta-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center transition-transform">
+                            0
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barre de recherche (Mobile déroulante) -->
+            <div id="mobileSearchContainer" class="hidden md:hidden pb-3">
+                <div class="relative w-full">
+                    <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input 
+                        type="text" 
+                        id="searchInputMobile"
+                        placeholder="Rechercher un produit..." 
+                        class="w-full bg-stone-100 text-sm text-stone-900 placeholder-stone-400 pl-10 pr-9 py-2.5 rounded-xl border border-stone-200 focus:bg-white focus:outline-none"
+                    >
+                    <button id="clearSearchMobile" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section Hero -->
+    <section class="relative bg-stone-100 border-b border-stone-200/70 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                <div class="lg:col-span-6 space-y-5 text-center lg:text-left">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-white text-stone-700 border border-stone-200 shadow-2xs">
+                        <span class="w-1.5 h-1.5 rounded-full bg-terracotta-500"></span>
+                        Collection Automne — Hiver
+                    </span>
+                    <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-semibold text-stone-900 leading-[1.12]">
+                        L'essence du design <span class="italic font-normal text-stone-600">intemporel</span> chez vous.
+                    </h1>
+                    <p class="text-stone-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        Des pièces façonnées avec des matériaux nobles, pensées pour traverser le temps et apaiser votre quotidien.
+                    </p>
+                    <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                        <a href="#catalogue" class="px-6 py-3.5 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium rounded-full transition-all shadow-sm hover:shadow-md">
+                            Explorer le catalogue
+                        </a>
+                        <button onclick="filterByCategory('Luminaires')" class="px-6 py-3.5 bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 text-sm font-medium rounded-full transition-all">
+                            Voir les luminaires
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="relative rounded-3xl overflow-hidden shadow-xl aspect-[16/10] sm:aspect-[16/9] bg-stone-200">
+                        <img 
+                            src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80" 
+                            alt="Intérieur minimaliste scandinave" 
+                            class="w-full h-full object-cover object-center"
+                            onerror="this.src='https://placehold.co/1200x700/e7e5e4/292524?text=Collection+L%27Atelier+Nordique'"
+                        >
+                        <div class="absolute bottom-4 left-4 right-4 sm:right-auto bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-stone-100 flex items-center justify-center text-stone-900 shrink-0">
+                                <i data-lucide="award" class="w-5 h-5 text-terracotta-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Artisanat Européen</p>
+                                <p class="text-sm font-semibold text-stone-900">Bois certifié FSC & Céramique brute</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenu Principal : Catalogue -->
+    <main id="catalogue" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        
+        <!-- Barre d'outils : Filtres par catégorie + Tri -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-stone-200">
+            
+            <!-- Onglets Catégories (Défilables sur mobile) -->
+            <div id="categoryFilters" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                <!-- Généré dynamiquement par JS -->
+            </div>
+
+            <!-- Compteur & Sélecteur de tri -->
+            <div class="flex items-center justify-between md:justify-end gap-4 shrink-0">
+                <span id="productCount" class="text-sm text-stone-500 font-medium">
+                    12 produits
+                </span>
+                <div class="relative">
+                    <select id="sortSelect" onchange="handleSort(this.value)" class="appearance-none bg-white border border-stone-200 hover:border-stone-300 text-stone-800 text-sm font-medium rounded-xl pl-3.5 pr-9 py-2 focus:outline-none focus:ring-2 focus:ring-stone-900/10 cursor-pointer">
+                        <option value="featured">Trier : Pertinence</option>
+                        <option value="price-asc">Prix : Croissant</option>
+                        <option value="price-desc">Prix : Décroissant</option>
+                        <option value="rating">Meilleures notes</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-stone-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grille des produits -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-7 mt-8">
+            <!-- Cartes produits injectées par JS -->
+        </div>
+
+        <!-- État vide (si aucun résultat de recherche/filtre) -->
+        <div id="emptyState" class="hidden py-20 text-center max-w-md mx-auto">
+            <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-stone-400">
+                <i data-lucide="search-x" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-stone-900 mb-1">Aucun produit trouvé</h3>
+            <p class="text-sm text-stone-500 mb-6">Nous n'avons trouvé aucun article correspondant à vos critères actuels.</p>
+            <button onclick="resetFilters()" class="px-5 py-2.5 bg-stone-900 text-white text-sm font-medium rounded-full hover:bg-stone-800 transition-colors">
+                Réinitialiser les filtres
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Section Engagements / Réassurance -->
+    <section class="bg-white border-t border-stone-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-stone-100 rounded-2xl text-stone-800 shrink-0">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-stone-900 text-sm">Livraison Soignée</h4>
+                        <p class="text-xs text-stone-500 mt-1 leading-relaxed">Expédition sous 24/48h avec suivi en temps réel et emballage éco-conçu.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-stone-100 rounded-2xl text-stone-800 shrink-0">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-stone-900 text-sm">Paiement 100% Sécurisé</h4>
+                        <p class="text-xs text-stone-500 mt-1 leading-relaxed">Transactions chiffrées SSL. Paiement en 3x sans frais disponible.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-stone-100 rounded-2xl text-stone-800 shrink-0">
+                        <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-stone-900 text-sm">30 Jours pour Changer d'Avis</h4>
+                        <p class="text-xs text-stone-500 mt-1 leading-relaxed">Retours simplifiés et remboursement intégral dès réception.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-stone-100 rounded-2xl text-stone-800 shrink-0">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-stone-900 text-sm">Garantie 2 Ans</h4>
+                        <p class="text-xs text-stone-500 mt-1 leading-relaxed">Toutes nos créations sont couvertes contre tout défaut de fabrication.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer class="bg-stone-900 text-stone-400 py-12 border-t border-stone-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-white text-stone-900 rounded-lg flex items-center justify-center font-serif text-lg italic font-bold">A</div>
+                <span class="font-serif text-lg text-white font-semibold">L'Atelier Nordique</span>
+            </div>
+            <p class="text-xs text-stone-500 text-center sm:text-left">
+                © 2026 L'Atelier Nordique — Boutique de démonstration interactive. Tous droits réservés.
+            </p>
+            <div class="flex items-center gap-5 text-xs font-medium">
+                <a href="#catalogue" class="hover:text-white transition-colors">Catalogue</a>
+                <button onclick="toggleCart(true)" class="hover:text-white transition-colors">Mon Panier</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- PANIER COULISSANT (DRAWER)                                            -->
+    <!-- ===================================================================== -->
+    <div id="cartOverlay" onclick="toggleCart(false)" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-40 hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col">
+        <!-- En-tête du panier -->
+        <div class="px-6 py-5 border-b border-stone-200 flex items-center justify-between bg-white">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-stone-900"></i>
+                <h2 class="text-lg font-semibold text-stone-900">Votre Panier</h2>
+                <span id="drawerCartCount" class="text-xs font-semibold bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-full">0</span>
+            </div>
+            <button onclick="toggleCart(false)" class="p-2 text-stone-400 hover:text-stone-800 hover:bg-stone-100 rounded-full transition-colors" aria-label="Fermer le panier">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Barre de progression livraison gratuite -->
+        <div id="freeShippingBar" class="px-6 py-3 bg-stone-50 border-b border-stone-200/80 text-xs">
+            <div class="flex items-center justify-between mb-1.5">
+                <span id="shippingMessage" class="font-medium text-stone-700">Ajoutez 100,00 € pour la livraison gratuite</span>
+                <span id="shippingPercent" class="font-semibold text-stone-900">0%</span>
+            </div>
+            <div class="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                <div id="shippingProgress" class="h-full bg-terracotta-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Liste des articles du panier -->
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Articles injectés dynamiquement -->
+        </div>
+
+        <!-- Pied du panier : Récapitulatif et Bouton Commander -->
+        <div id="cartFooter" class="p-6 bg-stone-50 border-t border-stone-200 space-y-4">
+            <!-- Code Promo -->
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="promoCodeInput" 
+                    placeholder="Code promo (ex: BIENVENUE10)" 
+                    class="flex-1 bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs uppercase tracking-wider focus:outline-none focus:border-stone-400"
+                >
+                <button onclick="applyPromoCode()" class="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-semibold rounded-xl transition-colors">
+                    Appliquer
+                </button>
+            </div>
+            <p id="promoFeedback" class="hidden text-xs font-medium"></p>
+
+            <!-- Lignes de calcul -->
+            <div class="space-y-2 text-sm pt-1">
+                <div class="flex justify-between text-stone-600">
+                    <span>Sous-total</span>
+                    <span id="cartSubtotal" class="font-medium text-stone-900">0,00 €</span>
+                </div>
+                <div id="discountRow" class="hidden justify-between text-emerald-600 font-medium">
+                    <span>Remise (BIENVENUE10 -10%)</span>
+                    <span id="cartDiscount">-0,00 €</span>
+                </div>
+                <div class="flex justify-between text-stone-600">
+                    <span>Livraison</span>
+                    <span id="cartShipping" class="font-medium text-stone-900">9,90 €</span>
+                </div>
+                <div class="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
+                    <span>Total TTC</span>
+                    <span id="cartTotal">0,00 €</span>
+                </div>
+            </div>
+
+            <button onclick="openCheckoutModal()" class="w-full py-3.5 px-6 bg-stone-900 hover:bg-stone-800 text-white font-medium text-sm rounded-full shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.99]">
+                <span>Passer la commande</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===================================================================== -->
+    <!-- MODALE APERÇU PRODUIT (QUICK VIEW)                                    -->
+    <!-- ===================================================================== -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-stone-100 relative animate-[fadeIn_0.2s_ease-out]">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-white/90 hover:bg-white text-stone-800 rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-105">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="productModalContent" class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Contenu injecté dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODALE SIMULATION DE COMMANDE (CHECKOUT)                              -->
+    <!-- ===================================================================== -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-100 relative my-8">
+            <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 p-2 text-stone-400 hover:text-stone-800 hover:bg-stone-100 rounded-full transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Formulaire de commande -->
+            <div id="checkoutFormView">
+                <div class="mb-6">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-terracotta-500">Finalisation</span>
+                    <h3 class="font-serif text-2xl font-semibold text-stone-900 mt-1">Informations de livraison</h3>
+                </div>
+
+                <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-1">Prénom *</label>
+                            <input type="text" required placeholder="Camille" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-1">Nom *</label>
+                            <input type="text" required placeholder="Laurent" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Adresse e-mail *</label>
+                        <input type="email" required placeholder="camille.laurent@exemple.fr" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">Adresse postale *</label>
+                        <input type="text" required placeholder="24 Rue des Rosiers" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-1">Code postal *</label>
+                            <input type="text" required placeholder="75004" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-stone-700 mb-1">Ville *</label>
+                            <input type="text" required placeholder="Paris" class="w-full border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-stone-900">
+                        </div>
+                    </div>
+
+                    <!-- Mode de paiement simulé -->
+                    <div class="pt-2">
+                        <label class="block text-xs font-semibold text-stone-700 mb-2">Moyen de paiement</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2.5 p-3 border-2 border-stone-900 bg-stone-50 rounded-xl cursor-pointer">
+                                <input type="radio" name="payment" checked class="accent-stone-900">
+                                <i data-lucide="credit-card" class="w-4 h-4 text-stone-800"></i>
+                                <span class="text-xs font-semibold">Carte Bancaire</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 p-3 border border-stone-200 hover:border-stone-300 rounded-xl cursor-pointer">
+                                <input type="radio" name="payment" class="accent-stone-900">
+                                <i data-lucide="wallet" class="w-4 h-4 text-stone-600"></i>
+                                <span class="text-xs font-medium">Apple Pay / PayPal</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-stone-100 p-4 rounded-2xl flex items-center justify-between mt-4">
+                        <span class="text-sm font-medium text-stone-600">Montant total à régler</span>
+                        <span id="checkoutModalTotal" class="text-lg font-bold text-stone-900">0,00 €</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-medium text-sm rounded-full shadow-md transition-all mt-2">
+                        Confirmer et payer la commande
+                    </button>
+                </form>
+            </div>
+
+            <!-- Écran de confirmation de commande -->
+            <div id="checkoutSuccessView" class="hidden text-center py-6 space-y-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="check" class="w-8 h-8 stroke-[2.5]"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-semibold text-stone-900">Merci pour votre commande !</h3>
+                <p class="text-sm text-stone-600 max-w-sm mx-auto leading-relaxed">
+                    Votre commande <span id="orderNumberDisplay" class="font-mono font-semibold text-stone-900">#AN-8492</span> a bien été enregistrée. Un e-mail de confirmation vient de vous être envoyé.
+                </p>
+                <div class="pt-4">
+                    <button onclick="closeCheckoutModal(true)" class="px-6 py-3 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium rounded-full transition-colors">
+                        Continuer mes achats
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-medium">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+            <span id="toastMessage">Produit ajouté au panier</span>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- LOGIQUE JAVASCRIPT DE LA BOUTIQUE                                     -->
+    <!-- ===================================================================== -->
+    <script>
+        // 1. BASE DE DONNÉES DES PRODUITS
+        const PRODUCTS = [
+            {
+                id: 1,
+                name: "Fauteuil Lounge Oslo",
+                category: "Mobilier",
+                price: 389.00,
+                oldPrice: 449.00,
+                rating: 4.9,
+                reviews: 42,
+                badge: "Promo",
+                image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=800&q=80",
+                description: "Structure en chêne massif huilé et assise en tissu bouclette écru ultra-doux. Un confort enveloppant pensé pour vos moments de lecture."
+            },
+            {
+                id: 2,
+                name: "Lampe à Poser Solis",
+                category: "Luminaires",
+                price: 115.00,
+                rating: 4.8,
+                reviews: 29,
+                badge: "Best-seller",
+                image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+                description: "Diffuseur en verre opalin soufflé à la bouche reposant sur un socle en laiton brossé. Éclairage chaud et apaisant avec variateur tactile."
+            },
+            {
+                id: 3,
+                name: "Vase Amphore Terracotta",
+                category: "Décoration",
+                price: 48.00,
+                rating: 4.7,
+                reviews: 18,
+                image: "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&w=800&q=80",
+                description: "Façonné à la main par des artisans céramistes. Sa texture minérale brute sublime aussi bien les fleurs séchées que les branches d'eucalyptus."
+            },
+            {
+                id: 4,
+                name: "Carafe & Verres Borosilicate",
+                category: "Art de la table",
+                price: 54.00,
+                rating: 4.9,
+                reviews: 34,
+                badge: "Nouveau",
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80",
+                description: "Ensemble composé d'une carafe cannelée de 1,2L et de deux verres assortis en verre borosilicate léger et résistant aux chocs thermiques."
+            },
+            {
+                id: 5,
+                name: "Table d'Appoint Copenhague",
+                category: "Mobilier",
+                price: 169.00,
+                rating: 4.6,
+                reviews: 15,
+                image: "https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=800&q=80",
+                description: "Lignes épurées en frêne naturel certifié FSC. Idéale en bout de canapé ou table de chevet minimaliste."
+            },
+            {
+                id: 6,
+                name: "Suspension Plissée Lin",
+                category: "Luminaires",
+                price: 135.00,
+                rating: 4.8,
+                reviews: 21,
+                image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
+                description: "Abat-jour en lin naturel plissé à la main offrant une lumière douce et feutrée au-dessus d'une table à manger."
+            },
+            {
+                id: 7,
+                name: "Plaid Tissé Mérinos & Coton",
+                category: "Textiles",
+                price: 89.00,
+                oldPrice: 110.00,
+                rating: 4.9,
+                reviews: 51,
+                badge: "Promo",
+                image: "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?auto=format&fit=crop&w=800&q=80",
+                description: "Tissage gaufré respirant mêlant laine mérinos fine et coton biologique. Finitions frangées délicates."
+            },
+            {
+                id: 8,
+                name: "Set de 4 Assiettes Grès Moucheté",
+                category: "Art de la table",
+                price: 68.00,
+                rating: 4.8,
+                reviews: 27,
+                image: "https://images.unsplash.com/photo-1603199506016-b9a594b593c0?auto=format&fit=crop&w=800&q=80",
+                description: "Grès émaillé réactif aux nuances sable et pierre. Chaque pièce présente un motif moucheté unique. Compatible lave-vaisselle."
+            },
+            {
+                id: 9,
+                name: "Miroir Organique Asymétrique",
+                category: "Décoration",
+                price: 129.00,
+                rating: 4.7,
+                reviews: 19,
+                badge: "Nouveau",
+                image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=800&q=80",
+                description: "Silhouette fluide sans cadre apparent qui agrandit l'espace et apporte une douceur sculpturale à vos murs."
+            },
+            {
+                id: 10,
+                name: "Housse de Coussin Velours Côtelé",
+                category: "Textiles",
+                price: 32.00,
+                rating: 4.5,
+                reviews: 38,
+                image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80",
+                description: "Velours côtelé épais teinte terre cuite, fermeture éclair invisible. Dimensions 50 x 50 cm."
+            },
+            {
+                id: 11,
+                name: "Bougie Parfumée Cèdre & Figue",
+                category: "Décoration",
+                price: 36.00,
+                rating: 4.9,
+                reviews: 64,
+                badge: "Best-seller",
+                image: "https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?auto=format&fit=crop&w=800&q=80",
+                description: "Cire 100% végétale de soja et mèche en coton tressé. 55 heures de combustion aux notes boisées et méditerranéennes."
+            },
+            {
+                id: 12,
+                name: "Tabouret Sculptural en Noyer",
+                category: "Mobilier",
+                price: 195.00,
+                rating: 4.8,
+                reviews: 12,
+                image: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80",
+                description: "Pièce polyvalente en noyer massif foncé pouvant servir d'assise d'appoint ou de piédestal pour vos plantes."
+            }
+        ];
+
+        // 2. ÉTAT DE L'APPLICATION
+        let state = {
+            selectedCategory: 'Tout',
+            searchQuery: '',
+            sortBy: 'featured',
+            cart: JSON.parse(localStorage.getItem('atelier_nordique_cart')) || [],
+            promoApplied: false
+        };
+
+        const FREE_SHIPPING_THRESHOLD = 100;
+        const SHIPPING_COST = 9.90;
+
+        // 3. UTILITAIRES
+        function formatPrice(price) {
+            return price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+        }
+
+        function saveCart() {
+            localStorage.setItem('atelier_nordique_cart', JSON.stringify(state.cart));
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+
+        // 4. RENDU DES CATÉGORIES & PRODUITS
+        function renderCategories() {
+            const categories = ['Tout', ...new Set(PRODUCTS.map(p => p.category))];
+            const container = document.getElementById('categoryFilters');
+            
+            container.innerHTML = categories.map(cat => {
+                const isActive = state.selectedCategory === cat;
+                return `
+                    <button 
+                        onclick="filterByCategory('${cat}')"
+                        class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                            isActive 
+                            ? 'bg-stone-900 text-white shadow-xs' 
+                            : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200/80'
+                        }"
+                    >
+                        ${cat}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function getFilteredProducts() {
+            return PRODUCTS
+                .filter(product => {
+                    const matchesCategory = state.selectedCategory === 'Tout' || product.category === state.selectedCategory;
+                    const query = state.searchQuery.toLowerCase().trim();
+                    const matchesSearch = !query || 
+                        product.name.toLowerCase().includes(query) || 
+                        product.category.toLowerCase().includes(query) ||
+                        product.description.toLowerCase().includes(query);
+                    return matchesCategory && matchesSearch;
+                })
+                .sort((a, b) => {
+                    if (state.sortBy === 'price-asc') return a.price - b.price;
+                    if (state.sortBy === 'price-desc') return b.price - a.price;
+                    if (state.sortBy === 'rating') return b.rating - a.rating;
+                    return 0; // 'featured'
+                });
+        }
+
+        function renderProducts() {
+            const filtered = getFilteredProducts();
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countLabel = document.getElementById('productCount');
+
+            countLabel.textContent = `${filtered.length} produit${filtered.length > 1 ? 's' : ''}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(product => {
+                const badgeColors = {
+                    'Promo': 'bg-terracotta-500 text-white',
+                    'Nouveau': 'bg-stone-900 text-white',
+                    'Best-seller': 'bg-amber-100 text-amber-900 border border-amber-200'
+                };
+
+                return `
+                    <article class="group bg-white rounded-3xl border border-stone-200/80 overflow-hidden hover:shadow-xl hover:border-stone-300/80 transition-all duration-300 flex flex-col">
+                        <!-- Image & Badges -->
+                        <div class="relative aspect-[4/4] bg-stone-100 overflow-hidden cursor-pointer" onclick="openProductModal(${product.id})">
+                            <img 
+                                src="${product.image}" 
+                                alt="${product.name}" 
+                                loading="lazy"
+                                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                onerror="this.src='https://placehold.co/600x600/f5f5f4/292524?text=${encodeURIComponent(product.name)}'"
+                            >
+                            ${product.badge ? `
+                                <span class="absolute top-3.5 left-3.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-xs ${badgeColors[product.badge] || 'bg-stone-900 text-white'}">
+                                    ${product.badge}
+                                </span>
+                            ` : ''}
+                            
+                            <!-- Bouton Aperçu Rapide au survol -->
+                            <button 
+                                onclick="event.stopPropagation(); openProductModal(${product.id})"
+                                class="absolute bottom-3.5 right-3.5 w-10 h-10 bg-white/95 hover:bg-white text-stone-900 rounded-full shadow-md flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+                                title="Aperçu rapide"
+                            >
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Détails produit -->
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between text-xs text-stone-400 mb-1.5">
+                                    <span class="font-medium uppercase tracking-wider">${product.category}</span>
+                                    <div class="flex items-center gap-1 text-stone-700 font-medium">
+                                        <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                        <span>${product.rating}</span>
+                                        <span class="text-stone-400">(${product.reviews})</span>
+                                    </div>
+                                </div>
+                                <h3 onclick="openProductModal(${product.id})" class="font-semibold text-stone-900 text-base group-hover:text-terracotta-600 transition-colors cursor-pointer line-clamp-1">
+                                    ${product.name}
+                                </h3>
+                                <p class="text-xs text-stone-500 mt-1.5 line-clamp-2 leading-relaxed">
+                                    ${product.description}
+                                </p>
+                            </div>
+
+                            <!-- Prix & Bouton Ajout -->
+                            <div class="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between gap-2">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-lg font-bold text-stone-900">${formatPrice(product.price)}</span>
+                                    ${product.oldPrice ? `<span class="text-xs text-stone-400 line-through">${formatPrice(product.oldPrice)}</span>` : ''}
+                                </div>
+                                <button 
+                                    onclick="addToCart(${product.id})"
+                                    class="px-4 py-2.5 bg-stone-100 hover:bg-stone-900 text-stone-900 hover:text-white text-xs font-semibold rounded-full transition-colors flex items-center gap-1.5 active:scale-95"
+                                >
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>Ajouter</span>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // 5. FILTRES, RECHERCHE ET TRI
+        function filterByCategory(category) {
+            state.selectedCategory = category;
+            renderCategories();
+            renderProducts();
+        }
+
+        function handleSort(value) {
+            state.sortBy = value;
+            renderProducts();
+        }
+
+        function handleSearchInput(value) {
+            state.searchQuery = value;
+            // Synchroniser les deux champs de recherche (desktop & mobile)
+            document.getElementById('searchInputDesktop').value = value;
+            document.getElementById('searchInputMobile').value = value;
+            
+            document.getElementById('clearSearchDesktop').classList.toggle('hidden', !value);
+            document.getElementById('clearSearchMobile').classList.toggle('hidden', !value);
+            renderProducts();
+        }
+
+        function clearSearch() {
+            handleSearchInput('');
+        }
+
+        function resetFilters(e) {
+            if (e) e.preventDefault();
+            state.selectedCategory = 'Tout';
+            state.sortBy = 'featured';
+            document.getElementById('sortSelect').value = 'featured';
+            clearSearch();
+            renderCategories();
+            renderProducts();
+        }
+
+        function toggleMobileSearch() {
+            const container = document.getElementById('mobileSearchContainer');
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) {
+                document.getElementById('searchInputMobile').focus();
+            }
+        }
+
+        // 6. GESTION DU PANIER
+        function addToCart(productId, quantity = 1) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = state.cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                state.cart.push({ ...product, quantity });
+            }
+
+            saveCart();
+            updateCartUI();
+            
+            // Animation badge panier
+            const badge = document.getElementById('cartBadge');
+            badge.classList.add('scale-125');
+            setTimeout(() => badge.classList.remove('scale-125'), 200);
+
+            showToast(`« ${product.name} » ajouté au panier`);
+        }
+
+        function updateQuantity(productId, delta) {
+            const itemIndex = state.cart.findIndex(item => item.id === productId);
+            if (itemIndex === -1) return;
+
+            state.cart[itemIndex].quantity += delta;
+            if (state.cart[itemIndex].quantity <= 0) {
+                state.cart.splice(itemIndex, 1);
+            }
+
+            saveCart();
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            state.cart = state.cart.filter(item => item.id !== productId);
+            saveCart();
+            updateCartUI();
+        }
+
+        function applyPromoCode() {
+            const input = document.getElementById('promoCodeInput');
+            const feedback = document.getElementById('promoFeedback');
+            const code = input.value.trim().toUpperCase();
+
+            feedback.classList.remove('hidden', 'text-emerald-600', 'text-red-500');
+
+            if (code === 'BIENVENUE10') {
+                state.promoApplied = true;
+                feedback.textContent = "Code BIENVENUE10 appliqué (-10% sur votre commande) !";
+                feedback.classList.add('text-emerald-600');
+                updateCartUI();
+            } else if (code === '') {
+                state.promoApplied = false;
+                feedback.classList.add('hidden');
+                updateCartUI();
+            } else {
+                feedback.textContent = "Code invalide. Essayez BIENVENUE10";
+                feedback.classList.add('text-red-500');
+            }
+        }
+
+        function calculateTotals() {
+            const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discount = state.promoApplied ? subtotal * 0.10 : 0;
+            const discountedSubtotal = subtotal - discount;
+            const shipping = (discountedSubtotal === 0 || discountedSubtotal >= FREE_SHIPPING_THRESHOLD) ? 0 : SHIPPING_COST;
+            const total = discountedSubtotal + shipping;
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+            return { subtotal, discount, discountedSubtotal, shipping, total, totalItems };
+        }
+
+        function updateCartUI() {
+            const { subtotal, discount, discountedSubtotal, shipping, total, totalItems } = calculateTotals();
+
+            // Badges compteurs
+            document.getElementById('cartBadge').textContent = totalItems;
+            document.getElementById('drawerCartCount').textContent = totalItems;
+
+            // Barre de livraison gratuite
+            const progressBar = document.getElementById('shippingProgress');
+            const shippingMsg = document.getElementById('shippingMessage');
+            const shippingPct = document.getElementById('shippingPercent');
+            
+            const percentage = Math.min(100, Math.round((discountedSubtotal / FREE_SHIPPING_THRESHOLD) * 100));
+            progressBar.style.width = `${percentage}%`;
+            shippingPct.textContent = `${percentage}%`;
+
+            if (discountedSubtotal >= FREE_SHIPPING_THRESHOLD) {
+                shippingMsg.innerHTML = `<span class="text-emerald-600 font-semibold">Félicitations ! Vous bénéficiez de la livraison offerte.</span>`;
+                progressBar.classList.replace('bg-terracotta-500', 'bg-emerald-500');
+            } else {
+                const remaining = FREE_SHIPPING_THRESHOLD - discountedSubtotal;
+                shippingMsg.innerHTML = `Plus que <span class="font-semibold text-stone-900">${formatPrice(remaining)}</span> pour la livraison gratuite`;
+                progressBar.classList.replace('bg-emerald-500', 'bg-terracotta-500');
+            }
+
+            // Liste des articles
+            const container = document.getElementById('cartItemsContainer');
+            const footer = document.getElementById('cartFooter');
+            const freeShippingBar = document.getElementById('freeShippingBar');
+
+            if (state.cart.length === 0) {
+                footer.classList.add('hidden');
+                freeShippingBar.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-12">
+                        <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-400 mb-4">
+                            <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="font-semibold text-stone-900 mb-1">Votre panier est vide</h3>
+                        <p class="text-xs text-stone-500 max-w-xs mb-6">Découvrez notre sélection d'objets et de mobilier minimaliste pour embellir votre intérieur.</p>
+                        <button onclick="toggleCart(false)" class="px-5 py-2.5 bg-stone-900 text-white text-xs font-semibold rounded-full hover:bg-stone-800 transition-colors">
+                            Découvrir la boutique
+                        </button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            footer.classList.remove('hidden');
+            freeShippingBar.classList.remove('hidden');
+
+            container.innerHTML = state.cart.map(item => `
+                <div class="flex gap-4 bg-white p-3 rounded-2xl border border-stone-200/80">
+                    <img 
+                        src="${item.image}" 
+                        alt="${item.name}" 
+                        class="w-20 h-20 rounded-xl object-cover bg-stone-100 shrink-0"
+                        onerror="this.src='https://placehold.co/150x150/f5f5f4/292524?text=Produit'"
+                    >
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <h4 class="text-sm font-semibold text-stone-900 line-clamp-1">${item.name}</h4>
+                                <p class="text-xs text-stone-400">${item.category}</p>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-stone-400 hover:text-red-500 p-1 transition-colors" title="Supprimer">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-2">
+                            <!-- Contrôle quantité -->
+                            <div class="inline-flex items-center bg-stone-100 rounded-full p-0.5 border border-stone-200/60">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 rounded-full hover:bg-white flex items-center justify-center text-stone-700 transition-colors" aria-label="Diminuer">
+                                    <i data-lucide="minus" class="w-3 h-3"></i>
+                                </button>
+                                <span class="px-2.5 text-xs font-semibold text-stone-900">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 rounded-full hover:bg-white flex items-center justify-center text-stone-700 transition-colors" aria-label="Augmenter">
+                                    <i data-lucide="plus" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+
+                            <span class="text-sm font-bold text-stone-900">${formatPrice(item.price * item.quantity)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Mise à jour des montants
+            document.getElementById('cartSubtotal').textContent = formatPrice(subtotal);
+            
+            const discountRow = document.getElementById('discountRow');
+            if (state.promoApplied && discount > 0) {
+                discountRow.classList.remove('hidden');
+                discountRow.classList.add('flex');
+                document.getElementById('cartDiscount').textContent = `-${formatPrice(discount)}`;
+            } else {
+                discountRow.classList.add('hidden');
+                discountRow.classList.remove('flex');
+            }
+
+            document.getElementById('cartShipping').textContent = shipping === 0 ? 'Offerte' : formatPrice(shipping);
+            document.getElementById('cartTotal').textContent = formatPrice(total);
+
+            lucide.createIcons();
+        }
+
+        function toggleCart(open) {
+            const overlay = document.getElementById('cartOverlay');
+            const drawer = document.getElementById('cartDrawer');
+
+            if (open) {
+                overlay.classList.remove('hidden');
+                // Petit délai pour déclencher la transition CSS
+                requestAnimationFrame(() => {
+                    overlay.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.classList.add('opacity-0');
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+                document.body.style.overflow = '';
+            }
+        }
+
+        // 7. MODALE APERÇU PRODUIT
+        function openProductModal(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const modal = document.getElementById('productModal');
+            const content = document.getElementById('productModalContent');
+
+            content.innerHTML = `
+                <div class="bg-stone-100 aspect-square md:aspect-auto h-full">
+                    <img 
+                        src="${product.image}" 
+                        alt="${product.name}" 
+                        class="w-full h-full object-cover"
+                        onerror="this.src='https://placehold.co/600x600/f5f5f4/292524?text=${encodeURIComponent(product.name)}'"
+                    >
+                </div>
+                <div class="p-6 sm:p-8 flex flex-col justify-between space-y-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-terracotta-500">${product.category}</span>
+                            <span class="text-stone-300">•</span>
+                            <div class="flex items-center gap-1 text-xs font-medium text-stone-700">
+                                <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                <span>${product.rating}/5 (${product.reviews} avis)</span>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-2xl sm:text-3xl font-semibold text-stone-900">${product.name}</h3>
+                        <div class="flex items-baseline gap-2.5 pt-1">
+                            <span class="text-2xl font-bold text-stone-900">${formatPrice(product.price)}</span>
+                            ${product.oldPrice ? `<span class="text-sm text-stone-400 line-through">${formatPrice(product.oldPrice)}</span>` : ''}
+                        </div>
+                        <p class="text-sm text-stone-600 leading-relaxed pt-2">
+                            ${product.description}
+                        </p>
+                        <ul class="text-xs text-stone-500 space-y-1.5 pt-3 border-t border-stone-100">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> En stock — Expédition sous 24h</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Matériaux durables & certifiés</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button 
+                            onclick="addToCart(${product.id}); closeProductModal();" 
+                            class="flex-1 py-3.5 px-6 bg-stone-900 hover:bg-stone-800 text-white text-sm font-medium rounded-full shadow-md transition-all flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                            <span>Ajouter au panier</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 8. SIMULATION DE COMMANDE (CHECKOUT)
+        function openCheckoutModal() {
+            const { total } = calculateTotals();
+            document.getElementById('checkoutModalTotal').textContent = formatPrice(total);
+            
+            document.getElementById('checkoutFormView').classList.remove('hidden');
+            document.getElementById('checkoutSuccessView').classList.add('hidden');
+
+            toggleCart(false);
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeCheckoutModal(resetAfterOrder = false) {
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            
+            // Générer un numéro de commande aléatoire
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('orderNumberDisplay').textContent = `#AN-${randomNum}`;
+
+            // Afficher l'écran de succès
+            document.getElementById('checkoutFormView').classList.add('hidden');
+            document.getElementById('checkoutSuccessView').classList.remove('hidden');
+
+            // Vider le panier
+            state.cart = [];
+            state.promoApplied = false;
+            document.getElementById('promoCodeInput').value = '';
+            document.getElementById('promoFeedback').classList.add('hidden');
+            saveCart();
+            updateCartUI();
+            lucide.createIcons();
+        }
+
+        // 9. INITIALISATION & ÉCOUTEURS D'ÉVÉNEMENTS
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+            updateCartUI();
+            lucide.createIcons();
+
+            // Écouteurs recherche
+            document.getElementById('searchInputDesktop').addEventListener('input', (e) => handleSearchInput(e.target.value));
+            document.getElementById('searchInputMobile').addEventListener('input', (e) => handleSearchInput(e.target.value));
+
+            // Fermer les modales avec la touche Échap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    toggleCart(false);
+                    closeProductModal();
+                    closeCheckoutModal();
+                }
+            });
+
+            // Fermer modale produit au clic sur l'arrière-plan
+            document.getElementById('productModal').addEventListener('click', (e) => {
+                if (e.target.id === 'productModal') closeProductModal();
+            });
+        });
+    </script>
+</body>
+</html>
